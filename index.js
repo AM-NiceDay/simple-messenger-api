@@ -1,4 +1,4 @@
 require("babel-register");
 const app = require('./server');
 
-app.listen(3000);
+app.listen(8080);
