@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import jwt from 'express-jwt';
 import Chat from './models/Chat';
+import Message from './models/Message';
 
 const router = Router();
 
@@ -27,6 +28,36 @@ router.post('/chats', jwtCheck, (req, res) => {
 
   chat.save()
     .then(chat => res.status(200).json(chat));
+});
+
+router.get('/chats/:chatId/messages', jwtCheck, (req, res) => {
+  const userId = req.user.sub;
+  const { chatId } = req.params;
+
+  Message.find({ chatId: chatId }).exec()
+    .then(messages => res.status(200).json(messages));
+});
+
+router.post('/chats/:chatId/messages', jwtCheck, (req, res) => {
+  const userId = req.user.sub;
+  const { chatId } = req.params;
+  const { text } = req.body;
+
+  const message = new Message({
+    chatId,
+    userId,
+    text,
+  });
+
+  message.save()
+    .then(message => {
+      return Chat.findByIdAndUpdate(chatId, {
+        lastMessageId: message.id,
+        lastMessageCreated: message.created,
+      })
+        .then(() => message);
+    })
+    .then(message => res.status(200).json(message));
 })
 
 router.get('/ping', (req, res) => {
