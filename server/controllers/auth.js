@@ -2,8 +2,8 @@ import jwt from 'jsonwebtoken';
 import config from '../../config';
 import User from '../models/User';
 
-export const ensureAuthenticated = (req, res, next) => {
-  const token = req.body.token;
+export const jwtCheck = (req, res, next) => {
+  const token = req.get('Authorization').split('Bearer ')[0];
 
   if (!token) {
     return res.status(403).json({
@@ -21,7 +21,7 @@ export const ensureAuthenticated = (req, res, next) => {
 
 export const authenticate = (req, res) => {
   User.findOne({
-    name: req.body.name,
+    email: req.body.email,
   })
     .then(user => {
       if (!user) {
@@ -29,14 +29,12 @@ export const authenticate = (req, res) => {
       }
 
       if (user.password !== req.body.password) {
-        return res.status(400).json({ message: 'Authentication failse. Wrong password.' });
+        return res.status(400).json({ message: 'Authentication failed. Wrong password.' });
       }
 
       const token = jwt.sign(user, config.secret);
 
-      res.status(200).json({
-        token,
-      });
+      res.status(200).json(Object.assign({}, user.toObject(), { token }));
     })
     .catch(err => console.log(err));
 };

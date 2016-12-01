@@ -1,64 +1,17 @@
 import { Router } from 'express';
-import jwt from 'express-jwt';
-import Chat from './models/Chat';
-import Message from './models/Message';
+import { authenticate, jwtCheck } from './controllers/auth';
+import { createUser } from './controllers/user';
+import { getChats, createChat } from './controllers/chat';
+import { getChatMessages, createChatMessage } from './controllers/message';
 
 const router = Router();
 
-const jwtCheck = jwt({
-  secret: new Buffer('TyDao7Z2NvjbybR0yN0jrdIxQhMHLh5EIOPfyQ_17j1mF-3r2vi_u8wnIp0Xnjw5', 'base64'),
-  audience: 'uA4jpUU4udP87jShFTvZH6jSkH5PG8Os'
-});
-
-router.get('/chats', jwtCheck, (req, res) => {
-  const userId = req.user.sub;
-
-  Chat.find({ userIds: userId })
-    .exec()
-    .then(chats => res.status(200).json(chats));
-})
-
-router.post('/chats', jwtCheck, (req, res) => {
-  const userId = req.user.sub;
-  const { peerId } = req.body;
-
-  const chat = new Chat({
-    userIds: [userId, peerId],
-  });
-
-  chat.save()
-    .then(chat => res.status(200).json(chat));
-});
-
-router.get('/chats/:chatId/messages', jwtCheck, (req, res) => {
-  const userId = req.user.sub;
-  const { chatId } = req.params;
-
-  Message.find({ chatId: chatId }).exec()
-    .then(messages => res.status(200).json(messages));
-});
-
-router.post('/chats/:chatId/messages', jwtCheck, (req, res) => {
-  const userId = req.user.sub;
-  const { chatId } = req.params;
-  const { text } = req.body;
-
-  const message = new Message({
-    chatId,
-    userId,
-    text,
-  });
-
-  message.save()
-    .then(message => {
-      return Chat.findByIdAndUpdate(chatId, {
-        lastMessageId: message.id,
-        lastMessageCreated: message.created,
-      })
-        .then(() => message);
-    })
-    .then(message => res.status(200).json(message));
-})
+router.post('/auth', authenticate);
+router.post('/users', createUser);
+router.get('/chats', jwtCheck, getChats);
+router.post('/chats', jwtCheck, createChat);
+router.get('/chats/:chatId/messages', jwtCheck, getChatMessages);
+router.post('/chats/:chatId/messages', jwtCheck, createChatMessage);
 
 router.get('/ping', (req, res) => {
   res.send('pong');
