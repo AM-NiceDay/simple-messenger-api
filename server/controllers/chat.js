@@ -1,15 +1,29 @@
+import co from 'co';
+import uniq from 'lodash/uniq';
+import Message from '../models/Message';
 import Chat from '../models/Chat';
+import User from '../models/User';
 
-export const getChats = (req, res) => {
-  const userId = req.user.sub;
+const getAllUserIds = chats => chats.reduce((acc, chat) => acc.concat(chat.userIds), []);
+const getAllUniqUserIds = chats => uniq(getAllUserIds(chats));
 
-  Chat.find({ userIds: userId })
-    .exec()
-    .then(chats => res.status(200).json(chats));
-};
+const getAllMessageIds = chats => chats.reduce((acc, chat) => acc.concat([chat.lastMessageId]), []);
+
+export const getChats = co.wrap(function* (req, res) {
+  const userId = req.user._id;
+  const chats = yield Chat.find({ userIds: userId }).exec();
+  const userIds = getAllUniqUserIds(chats);
+  const messageIds = getAllMessageIds(chats);
+  const { users, messages } = {
+    users: yield User.find({ _id: { $in: userIds } }).exec(),
+    messages: yield Message.find({ _id: { $in: messageIds } }).exec(),
+  };
+
+  res.status(200).json({ chats, users, messages });
+})
 
 export const createChat = (req, res) => {
-  const userId = req.user.sub;
+  const userId = req.user._id;
   const { peerId } = req.body;
 
   const chat = new Chat({

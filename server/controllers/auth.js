@@ -3,7 +3,7 @@ import config from '../../config';
 import User from '../models/User';
 
 export const jwtCheck = (req, res, next) => {
-  const token = req.get('Authorization').split('Bearer ')[0];
+  const token = req.get('Authorization').split('Bearer ')[1];
 
   if (!token) {
     return res.status(403).json({
@@ -14,7 +14,7 @@ export const jwtCheck = (req, res, next) => {
   jwt.verify(token, config.secret, (err, decoded) => {
     if (err) return res.status(403).json({ message: 'Failed to authenticate token.' })
 
-    req.user = user;
+    req.user = decoded.user;
     next();
   })
 };
@@ -32,7 +32,7 @@ export const authenticate = (req, res) => {
         return res.status(400).json({ message: 'Authentication failed. Wrong password.' });
       }
 
-      const token = jwt.sign(user, config.secret);
+      const token = jwt.sign({ user }, config.secret);
 
       res.status(200).json(Object.assign({}, user.toObject(), { token }));
     })

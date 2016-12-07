@@ -1,3 +1,4 @@
+require("babel-polyfill");
 require("babel-register");
 const app = require('./server');
 
