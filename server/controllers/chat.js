@@ -33,3 +33,16 @@ export const createChat = (req, res) => {
   chat.save()
     .then(chat => res.status(200).json(chat));
 };
+
+export const createChatByEmail = co.wrap(function* (req, res) {
+  const userId = req.user._id;
+  const peer = yield User.findOne({ email: req.body.email });
+  const peerId = peer._id;
+
+  const chat = new Chat({
+    userIds: [userId, peerId],
+  });
+
+  chat.save()
+    .then(chat => res.status(200).json(chat));
+});

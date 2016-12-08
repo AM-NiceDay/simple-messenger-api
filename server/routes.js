@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticate, jwtCheck } from './controllers/auth';
 import { createUser } from './controllers/user';
-import { getChats, createChat } from './controllers/chat';
+import { getChats, createChat, createChatByEmail } from './controllers/chat';
 import { getChatMessages, createChatMessage } from './controllers/message';
 
 const router = Router();
@@ -10,6 +10,7 @@ router.post('/auth', authenticate);
 router.post('/users', createUser);
 router.get('/chats', jwtCheck, getChats);
 router.post('/chats', jwtCheck, createChat);
+router.post('/chatsByEmail', jwtCheck, createChatByEmail);
 router.get('/chats/:chatId/messages', jwtCheck, getChatMessages);
 router.post('/chats/:chatId/messages', jwtCheck, createChatMessage);
 
