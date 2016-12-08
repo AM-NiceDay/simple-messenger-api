@@ -31,6 +31,7 @@
     "mongoose": "^4.6.2",
     "morgan": "^1.7.0",
     "redis": "^2.6.3",
-    "socket.io": "^1.7.1"
+    "socket.io": "^1.7.1",
+    "starwars-names": "^1.6.0"
   }
 }
