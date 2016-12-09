@@ -1,0 +1,16 @@
+language: node_js
+
+node_js:
+  - "node"
+
+services:
+  - docker
+
+script:
+  - docker build -t niceday/simple-messenger-api .
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker push niceday/simple-messenger-api;
+    fi

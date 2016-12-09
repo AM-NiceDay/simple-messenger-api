@@ -9,13 +9,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AM-NiceDay/simple-messenger.git"
+    "url": "git+https://github.com/AM-NiceDay/simple-messenger-api.git"
   },
   "author": "",
   "bugs": {
-    "url": "https://github.com/AM-NiceDay/simple-messenger/issues"
+    "url": "https://github.com/AM-NiceDay/simple-messenger-api/issues"
   },
-  "homepage": "https://github.com/AM-NiceDay/simple-messenger#readme",
+  "homepage": "https://github.com/AM-NiceDay/simple-messenger-api#readme",
   "devDependencies": {
     "babel": "^6.5.2",
     "babel-polyfill": "^6.16.0",
