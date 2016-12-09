@@ -3,7 +3,7 @@ import redis from 'redis';
 import Message from '../models/Message';
 import Chat from '../models/Chat';
 
-const redisPub = redis.createClient();
+const redisPub = redis.createClient({ host: 'redis' });
 
 export const getChatMessages = (req, res) => {
   const userId = req.user._id;
