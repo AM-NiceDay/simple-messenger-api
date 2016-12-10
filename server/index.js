@@ -11,7 +11,7 @@ import routes from './routes';
 
 const app = express();
 const port = process.env.PORT || 3000;
-mongoose.connect('mongo/messenger');
+mongoose.connect(config.mongoHost);
 mongoose.Promise = Promise;
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -22,7 +22,7 @@ app.use(morgan('dev'));
 app.use('/api/v1/', routes);
 
 
-const redisSub = redis.createClient({ host: 'redis' });
+const redisSub = redis.createClient({ host: config.redisHost });
 const server = http.Server(app);
 const io = socket(server);
 
