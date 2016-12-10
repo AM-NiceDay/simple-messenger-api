@@ -1,3 +1,5 @@
+import co from 'co';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import config from '../../config';
 import User from '../models/User';
@@ -19,22 +21,19 @@ export const jwtCheck = (req, res, next) => {
   })
 };
 
-export const authenticate = (req, res) => {
-  User.findOne({
-    email: req.body.email,
-  })
-    .then(user => {
-      if (!user) {
-        return res.status(404).json({ message: 'Authentication failed. User not found.' });
-      }
+export const authenticate = co.wrap(function* (req, res){
+  const user = yield User.findOne({ email: req.body.email });
 
-      if (user.password !== req.body.password) {
-        return res.status(400).json({ message: 'Authentication failed. Wrong password.' });
-      }
+  if (!user) {
+    return res.status(404).json({ message: 'Authentication failed. User not found.' });
+  }
 
-      const token = jwt.sign({ user }, config.secret);
+  const isPasswordMatch = yield bcrypt.compare(req.body.password, user.password);
+  if (!isPasswordMatch) {
+    return res.status(400).json({ message: 'Authentication failed. Wrong password.' });
+  }
 
-      res.status(200).json(Object.assign({}, user.toObject(), { token }));
-    })
-    .catch(err => console.log(err));
-};
+  const token = jwt.sign({ user }, config.secret);
+
+  res.status(200).json(Object.assign({}, user.toObject(), { token }));
+});
