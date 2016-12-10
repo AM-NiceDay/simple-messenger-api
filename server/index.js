@@ -21,6 +21,11 @@ app.use(morgan('dev'));
 
 app.use('/api/v1/', routes);
 
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).send('Something went wrong');
+});
+
 
 const redisSub = redis.createClient({ host: config.redisHost });
 const server = http.Server(app);
