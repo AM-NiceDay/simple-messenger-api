@@ -2,6 +2,12 @@ import co from 'co';
 import bcrypt from 'bcrypt';
 import User from '../models/User';
 
+export const getUsers = co.wrap(function* (req, res) {
+  const users = yield User.find().exec();
+
+  res.status(200).json(users);
+});
+
 export const createUser = co.wrap(function* (req, res) {
   const { email, password } = req.body;
   const hash = yield bcrypt.hash(password, 10);
