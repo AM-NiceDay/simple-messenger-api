@@ -37,12 +37,35 @@ export const createChat = (req, res) => {
 export const createChatByEmail = co.wrap(function* (req, res) {
   const userId = req.user._id;
   const peer = yield User.findOne({ email: req.body.email });
-  const peerId = peer._id;
 
-  const chat = new Chat({
-    userIds: [userId, peerId],
+  if (peer === null) {
+    return res.status(400).json({
+      errors: {
+        email: {
+          message: 'There are no users with specified email',
+        },
+      },
+    });
+  }
+
+  const peerId = peer._id;
+  const existingChat = yield Chat.findOne({
+    userIds: { $size: 2, $all:[userId, peerId] },
   });
 
-  chat.save()
-    .then(chat => res.status(200).json(chat));
+  if (existingChat !== null) {
+    return res.status(400).json({
+      errors: {
+        email: {
+          message: 'You are already have chat with user with specified email',
+        },
+      },
+    });
+  }
+
+  const chat = yield new Chat({
+    userIds: [userId, peerId],
+  }).save();
+
+  return res.status(200).json(chat);
 });
