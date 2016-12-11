@@ -11,7 +11,7 @@ import routes from './routes';
 
 const app = express();
 const port = process.env.PORT || 3000;
-mongoose.connect('mongo/messenger');
+mongoose.connect(config.mongoHost);
 mongoose.Promise = Promise;
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -21,8 +21,13 @@ app.use(morgan('dev'));
 
 app.use('/api/v1/', routes);
 
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).send('Something went wrong');
+});
 
-const redisSub = redis.createClient({ host: 'redis' });
+
+const redisSub = redis.createClient({ host: config.redisHost });
 const server = http.Server(app);
 const io = socket(server);
 
@@ -30,7 +35,6 @@ const getNewMessage = (clientUserId) => {
   return new Promise((resolve) => {
     redisSub.on('message', (channel, message) => {
       const newMessage = JSON.parse(message);
-      console.log(`${clientUserId}: message for ${newMessage.toUserId}`);
       if (channel === 'r/new-message' && clientUserId === newMessage.toUserId) {
         resolve(newMessage);
       }
@@ -43,8 +47,12 @@ io.on('connection', (socket) => {
     console.log(`Client ${userId} listening for incomming messages`);
     while (true) {
       const newMessage = yield getNewMessage(userId);
-      console.log(`New message for client ${userId}: ${newMessage.messageId}`);
-      socket.emit('ws/new-message', newMessage);
+      console.log(`New message for client ${userId}`);
+      if (newMessage.type === 'message') {
+        socket.emit('ws/new-message', newMessage);
+      } else if (newMessage.type === 'chat') {
+        socket.emit('ws/new-chat', newMessage);
+      }
     }
   }));
 });

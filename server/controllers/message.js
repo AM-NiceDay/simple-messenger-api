@@ -1,9 +1,10 @@
 import co from 'co';
 import redis from 'redis';
+import config from '../../config';
 import Message from '../models/Message';
 import Chat from '../models/Chat';
 
-const redisPub = redis.createClient({ host: 'redis' });
+const redisPub = redis.createClient({ host: config.redisHost });
 
 export const getChatMessages = (req, res) => {
   const userId = req.user._id;
@@ -14,8 +15,6 @@ export const getChatMessages = (req, res) => {
 };
 
 export const createChatMessage = co.wrap(function* (req, res) {
-  const redisClient = req.app.get('redis-client');
-
   const userId = req.user._id;
   const { chatId } = req.params;
   const { text } = req.body;
@@ -31,6 +30,7 @@ export const createChatMessage = co.wrap(function* (req, res) {
   res.status(200).json(message);
 
   const redisMessage = {
+    type: 'message',
     toUserId: chat.userIds.filter(id => id !== userId)[0],
     messageId: message.id,
     chatId: chatId,

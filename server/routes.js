@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { authenticate, jwtCheck } from './controllers/auth';
-import { createUser } from './controllers/user';
+import { getUsers, createUser } from './controllers/user';
 import { getChats, createChat, createChatByEmail } from './controllers/chat';
 import { getChatMessages, createChatMessage } from './controllers/message';
 
 const router = Router();
 
 router.post('/auth', authenticate);
+router.get('/users', getUsers);
 router.post('/users', createUser);
 router.get('/chats', jwtCheck, getChats);
 router.post('/chats', jwtCheck, createChat);
