@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node
 
 COPY package.json /src/package.json
 RUN cd /src; npm install
