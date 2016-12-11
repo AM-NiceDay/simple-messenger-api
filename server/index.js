@@ -35,7 +35,6 @@ const getNewMessage = (clientUserId) => {
   return new Promise((resolve) => {
     redisSub.on('message', (channel, message) => {
       const newMessage = JSON.parse(message);
-      console.log(`${clientUserId}: message for ${newMessage.toUserId}`);
       if (channel === 'r/new-message' && clientUserId === newMessage.toUserId) {
         resolve(newMessage);
       }
@@ -48,8 +47,12 @@ io.on('connection', (socket) => {
     console.log(`Client ${userId} listening for incomming messages`);
     while (true) {
       const newMessage = yield getNewMessage(userId);
-      console.log(`New message for client ${userId}: ${newMessage.messageId}`);
-      socket.emit('ws/new-message', newMessage);
+      console.log(`New message for client ${userId}`);
+      if (newMessage.type === 'message') {
+        socket.emit('ws/new-message', newMessage);
+      } else if (newMessage.type === 'chat') {
+        socket.emit('ws/new-chat', newMessage);
+      }
     }
   }));
 });

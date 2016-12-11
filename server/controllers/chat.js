@@ -1,8 +1,12 @@
 import co from 'co';
+import redis from 'redis';
 import uniq from 'lodash/uniq';
+import config from '../../config';
 import Message from '../models/Message';
 import Chat from '../models/Chat';
 import User from '../models/User';
+
+const redisPub = redis.createClient({ host: config.redisHost });
 
 const getAllUserIds = chats => chats.reduce((acc, chat) => acc.concat(chat.userIds), []);
 const getAllUniqUserIds = chats => uniq(getAllUserIds(chats));
@@ -22,17 +26,21 @@ export const getChats = co.wrap(function* (req, res) {
   res.status(200).json({ chats, users, messages });
 })
 
-export const createChat = (req, res) => {
+export const createChat = co.wrap(function* (req, res) {
   const userId = req.user._id;
   const { peerId } = req.body;
 
-  const chat = new Chat({
-    userIds: [userId, peerId],
-  });
+  const chat = yield new Chat({ userIds: [userId, peerId] }).save();
+  res.status(200).json(chat);
 
-  chat.save()
-    .then(chat => res.status(200).json(chat));
-};
+  const redisMessage = {
+    type: 'chat',
+    toUserId: peerId,
+    chatId: chat._id,
+  };
+
+  redisPub.publish('r/new-message', JSON.stringify(redisMessage));
+});
 
 export const createChatByEmail = co.wrap(function* (req, res) {
   const userId = req.user._id;
