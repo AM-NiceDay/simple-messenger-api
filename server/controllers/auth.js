@@ -1,5 +1,5 @@
 import co from 'co';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import config from '../../config';
 import User from '../models/User';
