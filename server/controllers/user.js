@@ -1,5 +1,5 @@
 import co from 'co';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import User from '../models/User';
 
 export const getUsers = co.wrap(function* (req, res) {
