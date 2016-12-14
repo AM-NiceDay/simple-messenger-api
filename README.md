@@ -1,1 +1,1 @@
-# simple-messenger
+# simple-messenger-api
