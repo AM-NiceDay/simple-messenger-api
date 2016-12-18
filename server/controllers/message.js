@@ -1,9 +1,11 @@
+import mongoose from 'mongoose';
 import co from 'co';
 import redis from 'redis';
 import config from '../../config';
-import Message from '../models/Message';
-import Chat from '../models/Chat';
-import User from '../models/User';
+
+const Message = mongoose.model('Message');
+const Chat = mongoose.model('Chat');
+const User = mongoose.model('User');
 
 const redisPub = redis.createClient({ host: config.redisHost });
 

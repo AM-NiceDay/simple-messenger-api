@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 import redis from 'redis';
 import co from 'co';
+import './models';
 import config from '../config';
 import routes from './routes';
 

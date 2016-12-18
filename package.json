@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "NODE_ENV=test mocha --compilers js:babel-register --require babel-polyfill --require ./config/setup-test.js '**/*.spec.js'",
     "start": "nodemon"
   },
   "repository": {
@@ -18,10 +18,14 @@
   "homepage": "https://github.com/AM-NiceDay/simple-messenger-api#readme",
   "devDependencies": {
     "babel": "^6.5.2",
+    "babel-plugin-transform-object-rest-spread": "^6.20.2",
     "babel-polyfill": "^6.16.0",
     "babel-preset-latest": "^6.16.0",
     "babel-register": "^6.16.3",
-    "nodemon": "^1.10.2"
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "nodemon": "^1.10.2",
+    "sinon": "^1.17.6"
   },
   "dependencies": {
     "bcryptjs": "^2.4.0",

@@ -1,8 +1,10 @@
+import mongoose from 'mongoose';
 import co from 'co';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import config from '../../config';
-import User from '../models/User';
+
+const User = mongoose.model('User');
 
 export const jwtCheck = (req, res, next) => {
   const token = req.get('Authorization').split('Bearer ')[1];

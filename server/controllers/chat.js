@@ -1,10 +1,12 @@
+import mongoose from 'mongoose';
 import co from 'co';
 import redis from 'redis';
 import uniq from 'lodash/uniq';
 import config from '../../config';
-import Message from '../models/Message';
-import Chat from '../models/Chat';
-import User from '../models/User';
+
+const Message = mongoose.model('Message');
+const Chat = mongoose.model('Chat');
+const User = mongoose.model('User');
 
 const redisPub = redis.createClient({ host: config.redisHost });
 
@@ -15,7 +17,7 @@ const getAllMessageIds = chats => chats.reduce((acc, chat) => acc.concat([chat.l
 
 export const getChats = co.wrap(function* (req, res) {
   const userId = req.user._id;
-  const chats = yield Chat.find({ userIds: userId }).exec();
+  const chats = yield Chat.getUserChats(userId);
   const userIds = getAllUniqUserIds(chats);
   const messageIds = getAllMessageIds(chats);
   const { users, messages } = {

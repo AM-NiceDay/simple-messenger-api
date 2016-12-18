@@ -1,8 +1,10 @@
+import mongoose from 'mongoose';
 import co from 'co';
 import bcrypt from 'bcryptjs';
 import uniq from 'lodash/uniq';
-import User from '../models/User';
-import Chat from '../models/Chat';
+
+const Chat = mongoose.model('Chat');
+const User = mongoose.model('User');
 
 const getAllUserIds = chats => chats.reduce((acc, chat) => acc.concat(chat.userIds), []);
 const getAllUniqUserIds = chats => uniq(getAllUserIds(chats));
