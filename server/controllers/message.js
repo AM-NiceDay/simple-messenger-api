@@ -14,7 +14,7 @@ export const getChatMessages = co.wrap(function* (req, res) {
   const { chatId } = req.params;
 
   const messages = yield Message.find({ chatId: chatId }).exec();
-  const chat = yield Chat.findById(chatId);
+  const chat = yield Chat.getUserChat(userId, chatId);
   const users = yield User.find({ _id: { $in: chat.userIds } });
 
   res.status(200).json({ messages, chats: [chat], users });

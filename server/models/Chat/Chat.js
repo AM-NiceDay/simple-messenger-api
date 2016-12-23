@@ -1,6 +1,6 @@
 import co from 'co';
 import mongoose from 'mongoose';
-import { populateChatsWithPeerId } from './utils';
+import { populateChatWithPeerId, populateChatsWithPeerId } from './utils';
 
 const ChatSchema = mongoose.Schema({
   userIds: {
@@ -11,6 +11,11 @@ const ChatSchema = mongoose.Schema({
   lastMessageId: String,
   lastReadMessageIds: {},
 });
+
+ChatSchema.statics.getUserChat = function(userId, chatId) {
+  return this.findById(chatId)
+    .then(populateChatWithPeerId(userId));
+}
 
 ChatSchema.statics.getUserChats = co.wrap(function* (userId) {
   return this.find({ userIds: userId }).exec()

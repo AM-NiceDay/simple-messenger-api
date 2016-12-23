@@ -1,6 +1,8 @@
 import find from 'lodash/find';
 
-export const populateChatsWithPeerId = id => chats => chats.map(chat => ({
+export const populateChatWithPeerId = userId => chat => ({
   ...chat,
-  peerId: chat.userIds.filter(userId => id !== userId)[0],
-}));
+  peerId: chat.userIds.filter(id => userId !== id)[0],
+});
+
+export const populateChatsWithPeerId = userId => chats => chats.map(populateChatWithPeerId(userId));
