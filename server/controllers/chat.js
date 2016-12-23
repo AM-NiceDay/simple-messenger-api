@@ -79,3 +79,13 @@ export const createChatByEmail = co.wrap(function* (req, res) {
 
   return res.status(200).json(chat);
 });
+
+export const updateChatLastRead = co.wrap(function* (req, res) {
+  const { _id: userId } = req.user;
+  const { chatId } = req.params;
+  const { lastRead } = req.body;
+
+  const chat = yield Chat.updateChatLastRead({ userId, chatId, lastRead });
+  console.log(chat);
+  res.status(200).json(chat);
+});
